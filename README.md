@@ -27,13 +27,7 @@ img_input =  keras.models.Input(shape=(input_height, input_width,input_channels)
 
 def my_argamx(feat, img_input):
     x = feat
-    # x = keras.layers.Lambda(lambda x : tf.argmax(x, axis = 3))(x)
     x = keras.layers.Lambda(lambda x : tf.argmax(x, axis= 3,output_type=tf.dtypes.int32))(x)
-    #x = keras.layers.Lambda(lambda x : tf.cast(tf.argmax(x, axis= 3,output_type=tf.dtypes.int32), dtype = tf.float32))(x) 
-    # x = keras.layers.Lambda(lambda x : tf.argmax(x, axis = 3,output_type=tf.float32))(x)
-    #x = tf.to_float(x)
-    #x = keras.layers.Lambda(lambda x : tf.cast(x, tf.float32))(x)
-    #print(x.dtype)
     model = keras.models.Model(img_input, x)
     return model
 
@@ -44,8 +38,6 @@ def my_finetuning_model():
         json_string = f.read()
         with CustomObjectScope({'DepthwiseConv2D': keras.applications.mobilenet.DepthwiseConv2D, 'relu6':tf.nn.relu6}):
             base_model_network = model_from_json(json_string)
-        #base_model_network.summary()
-    #print(img_input)
     keras.models.Model(base_model_network.input, base_model_network.output).load_weights('/home/zhu/procedure/onnx/FCN-ResNet18-Cityscapes-1024x512/keras_train_ckpt/mobilenet_segnet_no_top.h5')
     return base_model_network.input, base_model_network.output
 
